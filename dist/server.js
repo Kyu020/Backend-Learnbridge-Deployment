@@ -20,7 +20,35 @@ const initializeBadge_1 = require("./scripts/initializeBadge");
 const database_1 = require("./database");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)({ origin: ["http://localhost:3000","https://learnbridge-dep-01.vercel.app"], credentials: true }));
+app.use((0, cors_1.default)({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://learnbridge-dep-01.vercel.app',
+      'https://learnbridge-dep-01-git-*.vercel.app'
+    ];
+    
+    // Check if the origin is in the allowed list
+    if (allowedOrigins.some(allowedOrigin => {
+      return origin === allowedOrigin || 
+             (allowedOrigin.includes('*') && origin.startsWith('https://learnbridge-dep-01-git-'));
+    })) {
+      return callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      return callback(new Error('Not allowed by CORS'), false);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With']
+}));
+
+// Handle preflight requests properly
+app.options('*', (0, cors_1.default)());
 app.use(express_1.default.json());
 //routes
 app.use("/api/auth", auth_1.default);
