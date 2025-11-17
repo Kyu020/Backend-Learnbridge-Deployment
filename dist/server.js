@@ -22,22 +22,30 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
+    // Allow requests with no origin
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
+      'http://localhost:3000',
       'https://learnbridge-dep-01.vercel.app',
-      'https://learnbridge-dep-01-git-*.vercel.app'
+      /https:\/\/learnbridge-dep-01-.*\.vercel\.app/,
+      /https:\/\/learnbridge-dep-01-git-.*\.vercel\.app/
     ];
     
-    // Check if the origin is in the allowed list
-    if (allowedOrigins.some(allowedOrigin => {
-      return origin === allowedOrigin || 
-             (allowedOrigin.includes('*') && origin.startsWith('https://learnbridge-dep-01-git-'));
-    })) {
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (typeof allowed === 'string') {
+        return origin === allowed;
+      } else if (allowed instanceof RegExp) {
+        return allowed.test(origin);
+      }
+      return false;
+    });
+    
+    if (isAllowed) {
+      console.log('✅ Allowed CORS for:', origin);
       return callback(null, true);
     } else {
-      console.log('Blocked by CORS:', origin);
+      console.log('❌ Blocked CORS for:', origin);
       return callback(new Error('Not allowed by CORS'), false);
     }
   },
