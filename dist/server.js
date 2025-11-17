@@ -26,7 +26,6 @@ app.use((0, cors_1.default)({
     if (!origin) return callback(null, true);
     
     const allowedOrigins = [
-      'http://localhost:3000',
       'https://learnbridge-dep-01.vercel.app',
       'https://learnbridge-dep-01-git-*.vercel.app'
     ];
