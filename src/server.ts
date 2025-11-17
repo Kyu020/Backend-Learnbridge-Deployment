@@ -18,7 +18,20 @@ import { connectDB } from "./database";
 dotenv.config();
 const app = express();
 
-app.use(cors({ origin: ["http://localhost:3000", "https://backend-learnbridge.onrender.com"], credentials: true }));
+// ✅ FIXED CORS - Allow your FRONTEND URL
+app.use(cors({ 
+  origin: [
+    "http://localhost:3000", 
+    "https://learnbridge-dep-01.vercel.app"  // Your frontend URL
+  ], 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 
 //routes
@@ -38,7 +51,6 @@ const port = process.env.PORT || 5000;
 async function startServer() {
     try{
       await connectDB();
-
       await initializeDefaultBadges();
 
       app.listen(port, () => {
@@ -50,4 +62,3 @@ async function startServer() {
 } 
 
 startServer();
-
