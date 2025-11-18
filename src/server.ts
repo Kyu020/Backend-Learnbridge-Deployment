@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import Badge from "./models/Badge";
 import authRoutes from "./routes/auth";
 import uploadRoutes from "./routes/upload";
 import tutorRoutes from "./routes/tutor";
@@ -18,19 +17,25 @@ import { connectDB } from "./database";
 dotenv.config();
 const app = express();
 
-// ✅ FIXED CORS - Allow your FRONTEND URL
+// CORS configuration
 app.use(cors({ 
   origin: [
     "http://localhost:3000", 
-    "https://learnbridge-dep-01.vercel.app"  // Your frontend URL
+    "https://learnbridge-dep-01.vercel.app"
   ], 
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
 
-// Handle preflight requests
-app.options('*', cors());
+// Handle preflight requests manually (FIXED)
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).send();
+});
 
 app.use(express.json());
 
